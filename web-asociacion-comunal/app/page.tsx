@@ -15,15 +15,19 @@ export default function Page() {
         </div>
 
         <div className="flex gap-2">
-          <Button>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button variant="secondary">
-            <Link href="/administracion">Administración</Link>
-          </Button>
-          <Button variant="secondary">
-            <Link href="/comunidad">Comunidad</Link>
-          </Button>
+
+            <Link href="/login">
+              <Button>Login</Button>
+            </Link>
+
+            <Link href="/administracion">
+              <Button variant="secondary">Administración</Button>
+            </Link>
+
+            <Link href="/comunidad">
+              <Button variant="secondary">Comunidad</Button>
+            </Link>
+
         </div>
       </div>
     </div>
