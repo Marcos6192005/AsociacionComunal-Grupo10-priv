@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default function Page() {
   return (
@@ -11,6 +12,18 @@ export default function Page() {
         </div>
         <div className="font-mono text-xs text-muted-foreground">
           (Puedes presionar <kbd>"d"</kbd> para cambiar el modo oscuro)
+        </div>
+
+        <div className="flex gap-2">
+          <Button>
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button variant="secondary">
+            <Link href="/administracion">Administración</Link>
+          </Button>
+          <Button variant="secondary">
+            <Link href="/comunidad">Comunidad</Link>
+          </Button>
         </div>
       </div>
     </div>
