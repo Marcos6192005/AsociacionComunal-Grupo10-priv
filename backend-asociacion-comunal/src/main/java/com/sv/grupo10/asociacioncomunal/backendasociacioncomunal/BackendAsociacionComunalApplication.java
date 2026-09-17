@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

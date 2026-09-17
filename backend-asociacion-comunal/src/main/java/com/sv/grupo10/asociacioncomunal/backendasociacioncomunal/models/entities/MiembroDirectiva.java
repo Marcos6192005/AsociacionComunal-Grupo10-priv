@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal.models.entities;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities;
 
 public class MiembroDirectiva {
 }

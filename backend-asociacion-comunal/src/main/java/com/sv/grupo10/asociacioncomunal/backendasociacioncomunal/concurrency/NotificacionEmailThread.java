@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal.concurrency;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.concurrency;
 
 public class NotificacionEmailThread {
 }

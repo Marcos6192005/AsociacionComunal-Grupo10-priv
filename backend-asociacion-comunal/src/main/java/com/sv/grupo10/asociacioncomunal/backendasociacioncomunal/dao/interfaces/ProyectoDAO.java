@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal.dao.interfaces;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.interfaces;
 
 public class ProyectoDAO {
 }

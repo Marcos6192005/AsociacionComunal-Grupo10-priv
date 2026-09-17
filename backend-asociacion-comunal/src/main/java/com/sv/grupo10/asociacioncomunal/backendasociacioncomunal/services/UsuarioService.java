@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal.services;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services;
 
 public class UsuarioService {
 }

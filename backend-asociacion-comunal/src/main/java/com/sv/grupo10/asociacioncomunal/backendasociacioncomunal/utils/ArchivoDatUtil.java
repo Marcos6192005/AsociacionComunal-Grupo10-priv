@@ -1,4 +1,4 @@
-package com.sv.grupo10.asociacioncomunal.backendasociaoncomunal.utils;
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.utils;
 
 public class ArchivoDatUtil {
 }
