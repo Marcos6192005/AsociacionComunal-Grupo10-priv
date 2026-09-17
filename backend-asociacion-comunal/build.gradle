@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.sv.grupo10.asociacioncomunal'
 version = '0.0.1-SNAPSHOT'
-description = 'backend-asociaon-comunal'
+description = 'backend-asociacion-comunal'
 
 java {
     toolchain {
