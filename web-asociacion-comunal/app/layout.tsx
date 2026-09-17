@@ -3,6 +3,14 @@ import { Geist, Geist_Mono, Outfit, Oxanium } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { ViewTransition } from 'react'
+
+
+export const metadata = {
+  title: 'Asociación Comunal',
+  description: 'Asociación Comunal',
+}
 
 const oxaniumHeading = Oxanium({subsets:['latin'],variable:'--font-heading'});
 
@@ -25,7 +33,11 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", outfit.variable, oxaniumHeading.variable)}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ViewTransition>
+          <TooltipProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </TooltipProvider>
+        </ViewTransition>
       </body>
     </html>
   )
