@@ -1,7 +1,9 @@
+"use client"
+
 import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
-import {
+import { 
   Card,
   CardContent,
   CardDescription,
@@ -16,12 +18,28 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { loginAction } from "@/actions/auth-action"
+import { useState } from "react"
+
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  return (
+    const [error, setError] = useState<string | null>(null)
+  
+    const handleSubmit = async (formData: FormData) => {
+        setError(null)
+
+        const result = await loginAction(formData)
+
+        if (result?.error){
+            setError(result.error)
+        }
+    }
+  
+  
+    return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
@@ -31,12 +49,13 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="micorreo@personal.com"
                   required
@@ -52,7 +71,7 @@ export function LoginForm({
                     Olvidaste tu contraseña?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
@@ -67,6 +86,7 @@ export function LoginForm({
       <FieldDescription className="px-6 text-center">
         2026 © Asociación Comunal Privada
       </FieldDescription>
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
     </div>
   )
 }
