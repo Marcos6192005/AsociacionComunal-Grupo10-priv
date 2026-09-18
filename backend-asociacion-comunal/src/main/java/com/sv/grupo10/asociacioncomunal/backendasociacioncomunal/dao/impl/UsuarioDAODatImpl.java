@@ -3,6 +3,7 @@ package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.impl;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.interfaces.UsuarioDAO;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.MiembroDirectiva;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Vecino;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.utils.ArchivoDatUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
@@ -47,7 +48,24 @@ public class UsuarioDAODatImpl implements UsuarioDAO {
                     "Presidente"
             );
 
+            MiembroDirectiva tesorero = new MiembroDirectiva(
+                    "Tesorera ADESCO",
+                    "tesorero@adesco.com",
+                    "teso123",
+                    "Tesorero"
+            );
+
+            // 3. Rol Vecino
+            Vecino vecino = new Vecino(
+                    "Vecino 1",
+                    "vecino@adesco.com",
+                    "vecino123",
+                    "Casa 42, Senda B"
+            );
+
             guardarUsuario(admin);
+            guardarUsuario(tesorero);
+            guardarUsuario(vecino);
             System.out.println("Usuario de prueba creado: admin@adesco.com / admin123");
         }
     }
