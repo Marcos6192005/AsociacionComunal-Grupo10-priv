@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button"
+import { cookies } from "next/headers"
 import Link from "next/link"
 
-export default function Page() {
+export default async function Page() {
+
+  const cookiesContext = await cookies();
+  const rol = cookiesContext.get("user_role")?.value
+
+  const isLoggedIn = rol !== undefined;
+
   return (
     <div className="flex min-h-svh p-6 items-center justify-center">
       <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
@@ -16,7 +23,7 @@ export default function Page() {
 
         <div className="flex gap-2">
 
-            <Link href="/login">
+            <Link href="/login" hidden={ isLoggedIn}>
               <Button>Login</Button>
             </Link>
 
