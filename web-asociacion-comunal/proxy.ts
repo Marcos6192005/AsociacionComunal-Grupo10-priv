@@ -1,0 +1,41 @@
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+
+export default function proxy(request: NextRequest){
+    const path = request.nextUrl.pathname
+
+    const isAuthRoute = path.startsWith('/login')
+    const isAdminRoute = path.startsWith('/administracion')
+    const isComunidadRoute = path.startsWith('/comunidad')
+
+    const token = request.cookies.get('jwt_token')?.value || ''
+    const rol = request.cookies.get('user_role')?.value || ''
+
+
+    if (!token && (isAdminRoute || isComunidadRoute)){
+        return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    if (token && isAuthRoute){
+        if (rol === 'ADMINISTRACION' || rol === 'ROLE_ADMIN'){
+            return NextResponse.redirect(new URL('/administracion', request.url))
+        } else {
+            return NextResponse.redirect(new URL('/comunidad', request.url))
+        }
+    }
+
+    if (token){
+        if (isAdminRoute && rol !== 'ADMINISTRACION' && rol !== 'ROLE_ADMIN'){
+            return NextResponse.redirect(new URL('/comunidad', request.url))
+        }
+    }
+
+    return NextResponse.next()
+
+}
+
+export const config = {
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico|$).*)'
+    ],
+}
