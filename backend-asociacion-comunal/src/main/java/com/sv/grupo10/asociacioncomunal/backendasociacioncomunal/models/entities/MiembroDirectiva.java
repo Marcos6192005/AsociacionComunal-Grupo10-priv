@@ -1,5 +1,7 @@
 package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities;
 
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.Roles;
+
 public class MiembroDirectiva extends Usuario {
 
     private static final long serialVersionUID = 1L;
@@ -12,7 +14,7 @@ public class MiembroDirectiva extends Usuario {
 
     @Override
     public String getRol(){
-        return "ADMINISTRACION";
+        return Roles.rolDesdeCargo(cargo);
     }
 
     public String getCargo(){return cargo;}

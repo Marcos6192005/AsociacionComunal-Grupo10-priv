@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { esRolDirectiva } from "@/lib/roles";
 
 export default function proxy(request: NextRequest){
     const path = request.nextUrl.pathname
@@ -10,7 +11,7 @@ export default function proxy(request: NextRequest){
 
     const token = request.cookies.get('jwt_token')?.value || ''
     const rol = request.cookies.get('user_role')?.value || ''
-    const isAdmin = rol === 'ADMINISTRACION' || rol === 'ROLE_ADMIN'
+    const isAdmin = esRolDirectiva(rol)
 
     if (!token && (isAdminRoute || isComunidadRoute)){
         return NextResponse.redirect(new URL('/login', request.url))

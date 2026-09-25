@@ -81,59 +81,93 @@ public class UsuarioDAODatImpl implements UsuarioDAO {
         List<Usuario> usuarios = ArchivoDatUtil.leerDatos(USUARIOS);
 
         if (usuarios.isEmpty()) {
-            System.out.println("No se encontraron usuarios. Creando administrador por defecto...");
-
-            MiembroDirectiva admin = new MiembroDirectiva(
-                    "Admin ADESCO",
-                    "admin@adesco.com",
-                    "admin123",
-                    "Presidente"
-            );
-
-            MiembroDirectiva tesorero = new MiembroDirectiva(
-                    "Tesorera ADESCO",
-                    "tesorero@adesco.com",
-                    "teso123",
-                    "Tesorero"
-            );
-
-            MiembroDirectiva secretario = new MiembroDirectiva(
-                    "Secretario ADESCO",
-                    "secretario@adesco.com",
-                    "secre123",
-                    "Secretario"
-            );
-
-            Vecino vecino = new Vecino(
-                    "Vecino 1",
-                    "vecino@adesco.com",
-                    "vecino123",
-                    "Casa 42, Senda B"
-            );
-
-            guardarUsuario(admin);
-            guardarUsuario(tesorero);
-            guardarUsuario(secretario);
-            guardarUsuario(vecino);
-            System.out.println("Usuario de prueba creado: admin@adesco.com / admin123");
-        } else {
-            asegurarSecretario(usuarios);
+            System.out.println("No se encontraron usuarios. Creando roles base de la asociacion...");
+            sembrarUsuariosBase();
+            return;
         }
+
+        asegurarUsuariosBase(usuarios);
     }
 
-    private void asegurarSecretario(List<Usuario> usuarios) {
+    private void sembrarUsuariosBase() {
+        guardarUsuario(new MiembroDirectiva(
+                "Presidente ADESCO",
+                "presidente@adesco.com",
+                "presi123",
+                "Presidente"
+        ));
+        guardarUsuario(new MiembroDirectiva(
+                "Secretario ADESCO",
+                "secretario@adesco.com",
+                "secre123",
+                "Secretario"
+        ));
+        guardarUsuario(new MiembroDirectiva(
+                "Tesorero ADESCO",
+                "tesorero@adesco.com",
+                "teso123",
+                "Tesorero"
+        ));
+        // Kept for backward compatibility with demos that still use admin@adesco.com
+        guardarUsuario(new MiembroDirectiva(
+                "Admin ADESCO",
+                "admin@adesco.com",
+                "admin123",
+                "Presidente"
+        ));
+        guardarUsuario(new Vecino(
+                "Vecino 1",
+                "vecino@adesco.com",
+                "vecino123",
+                "Casa 42, Senda B"
+        ));
+
+        System.out.println("Roles base creados: PRESIDENTE, SECRETARIO, TESORERO, VECINO");
+        System.out.println("Admin demos: admin@adesco.com / admin123 (rol PRESIDENTE)");
+    }
+
+    private void asegurarUsuariosBase(List<Usuario> usuarios) {
+        asegurarSiFalta(usuarios, "presidente@adesco.com", () -> new MiembroDirectiva(
+                "Presidente ADESCO",
+                "presidente@adesco.com",
+                "presi123",
+                "Presidente"
+        ));
+        asegurarSiFalta(usuarios, "secretario@adesco.com", () -> new MiembroDirectiva(
+                "Secretario ADESCO",
+                "secretario@adesco.com",
+                "secre123",
+                "Secretario"
+        ));
+        asegurarSiFalta(usuarios, "tesorero@adesco.com", () -> new MiembroDirectiva(
+                "Tesorero ADESCO",
+                "tesorero@adesco.com",
+                "teso123",
+                "Tesorero"
+        ));
+        asegurarSiFalta(usuarios, "admin@adesco.com", () -> new MiembroDirectiva(
+                "Admin ADESCO",
+                "admin@adesco.com",
+                "admin123",
+                "Presidente"
+        ));
+        asegurarSiFalta(usuarios, "vecino@adesco.com", () -> new Vecino(
+                "Vecino 1",
+                "vecino@adesco.com",
+                "vecino123",
+                "Casa 42, Senda B"
+        ));
+    }
+
+    private void asegurarSiFalta(List<Usuario> usuarios, String correo, java.util.function.Supplier<Usuario> factory) {
         boolean existe = usuarios.stream()
-                .anyMatch(usuario -> "secretario@adesco.com".equalsIgnoreCase(usuario.getCorreo()));
+                .anyMatch(usuario -> correo.equalsIgnoreCase(usuario.getCorreo()));
 
         if (!existe) {
-            MiembroDirectiva secretario = new MiembroDirectiva(
-                    "Secretario ADESCO",
-                    "secretario@adesco.com",
-                    "secre123",
-                    "Secretario"
-            );
-            guardarUsuario(secretario);
-            System.out.println("Secretario de prueba creado: secretario@adesco.com / secre123");
+            Usuario creado = factory.get();
+            guardarUsuario(creado);
+            usuarios.add(creado);
+            System.out.println("Usuario base creado: " + correo + " (" + creado.getRol() + ")");
         }
     }
 }

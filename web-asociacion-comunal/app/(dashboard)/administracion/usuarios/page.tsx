@@ -96,9 +96,9 @@ export default function Page() {
                         <td className="p-3">
                           <span
                             className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                              usuario.rol === "ADMINISTRACION"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
+                              usuario.rol === "VECINO"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-blue-100 text-blue-800"
                             }`}
                           >
                             {usuario.rol}

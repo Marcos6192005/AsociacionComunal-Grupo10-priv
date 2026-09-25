@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { esRolDirectiva } from "@/lib/roles"
 
 export async function loginAction(formData: FormData) {
   const correo = formData.get("email")
@@ -64,8 +65,7 @@ export async function loginAction(formData: FormData) {
   }
 
   if (success) {
-    const isAdmin = rol === "ADMINISTRACION" || rol === "ROLE_ADMIN"
-    redirect(isAdmin ? "/administracion" : "/comunidad")
+    redirect(esRolDirectiva(rol) ? "/administracion" : "/comunidad")
   }
 }
 export async function logoutAction() {

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -33,13 +34,21 @@ public class JwtFilter extends OncePerRequestFilter {
             String rol = jwtProvider.getRol(token);
 
             if (rol == null || rol.isBlank()) {
-                rol = "VECINO";
+                rol = Roles.VECINO;
+            }
+
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + rol));
+
+            // Junta roles keep ROLE_ADMINISTRACION so /api/admin/** still matches.
+            if (Roles.esRolDirectiva(rol) && !Roles.ADMINISTRACION.equals(Roles.normalizar(rol))) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + Roles.ADMINISTRACION));
             }
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     correo,
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + rol))
+                    authorities
             );
 
             SecurityContextHolder.getContext().setAuthentication(auth);
