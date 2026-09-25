@@ -12,6 +12,7 @@ export async function loginAction(formData: FormData) {
   }
 
   let success = false
+  let rol = ""
 
   try {
     const response = await fetch("http://localhost:8081/api/auth/login", {
@@ -46,12 +47,14 @@ export async function loginAction(formData: FormData) {
     })
 
     success = true
+    rol = data.rol
   } catch (error) {
     return { error: "Error de conexion con el servidor." }
   }
 
   if (success) {
-    redirect("/administracion")
+    const isAdmin = rol === "ADMINISTRACION" || rol === "ROLE_ADMIN"
+    redirect(isAdmin ? "/administracion" : "/comunidad")
   }
 }
 export async function logoutAction() {
