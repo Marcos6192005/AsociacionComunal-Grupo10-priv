@@ -1,0 +1,220 @@
+package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.impl;
+
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.interfaces.CuotaDAO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.interfaces.MovimientoDAO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.BalanceDTO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.CuotaRequestDTO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.MovimientoRequestDTO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Cuota;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.MiembroDirectiva;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Movimiento;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Vecino;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.TesoreriaService;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+@Service
+public class TesoreriaServiceImpl implements TesoreriaService {
+
+    private static final String INGRESO = "INGRESO";
+    private static final String EGRESO = "EGRESO";
+    private static final String PENDIENTE = "PENDIENTE";
+    private static final String PAGADA = "PAGADA";
+
+    private static final Set<String> CARGOS_ESCRITURA = Set.of("PRESIDENTE", "TESORERO");
+    private static final Set<String> TIPOS_MOVIMIENTO = Set.of(INGRESO, EGRESO);
+
+    private final MovimientoDAO movimientoDAO;
+    private final CuotaDAO cuotaDAO;
+    private final UsuarioService usuarioService;
+
+    public TesoreriaServiceImpl(
+            MovimientoDAO movimientoDAO,
+            CuotaDAO cuotaDAO,
+            UsuarioService usuarioService
+    ) {
+        this.movimientoDAO = movimientoDAO;
+        this.cuotaDAO = cuotaDAO;
+        this.usuarioService = usuarioService;
+    }
+
+    @Override
+    public List<Movimiento> listarMovimientos(String correoAdmin) {
+        exigirMiembroDirectiva(correoAdmin);
+        return movimientoDAO.listar();
+    }
+
+    @Override
+    public Movimiento registrarMovimiento(String correoAdmin, MovimientoRequestDTO request) {
+        MiembroDirectiva admin = exigirEscrituraTesoreria(correoAdmin);
+
+        if (request.tipo() == null || request.tipo().isBlank()) {
+            throw new IllegalArgumentException("El tipo es obligatorio (INGRESO o EGRESO)");
+        }
+
+        String tipo = request.tipo().trim().toUpperCase();
+        if (!TIPOS_MOVIMIENTO.contains(tipo)) {
+            throw new IllegalArgumentException("El tipo debe ser INGRESO o EGRESO");
+        }
+
+        if (request.concepto() == null || request.concepto().isBlank()) {
+            throw new IllegalArgumentException("El concepto es obligatorio");
+        }
+
+        if (request.monto() == null || request.monto() <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a cero");
+        }
+
+        String fecha = request.fecha() != null && !request.fecha().isBlank()
+                ? request.fecha().trim()
+                : LocalDate.now().toString();
+
+        String proyectoId = request.proyectoId() != null && !request.proyectoId().isBlank()
+                ? request.proyectoId().trim()
+                : null;
+
+        Movimiento movimiento = new Movimiento(
+                tipo,
+                request.concepto().trim(),
+                request.monto(),
+                fecha,
+                proyectoId,
+                correoAdmin,
+                admin.getNombre()
+        );
+
+        return movimientoDAO.guardar(movimiento);
+    }
+
+    @Override
+    public BalanceDTO calcularBalance() {
+        List<Movimiento> movimientos = movimientoDAO.listar();
+        double ingresos = movimientos.stream()
+                .filter(movimiento -> INGRESO.equals(movimiento.getTipo()))
+                .mapToDouble(Movimiento::getMonto)
+                .sum();
+        double egresos = movimientos.stream()
+                .filter(movimiento -> EGRESO.equals(movimiento.getTipo()))
+                .mapToDouble(Movimiento::getMonto)
+                .sum();
+
+        return new BalanceDTO(ingresos, egresos, ingresos - egresos, movimientos.size());
+    }
+
+    @Override
+    public List<Cuota> listarCuotas(String correoAdmin) {
+        exigirMiembroDirectiva(correoAdmin);
+        return cuotaDAO.listar();
+    }
+
+    @Override
+    public List<Cuota> listarCuotasPorVecino(String correoVecino) {
+        return cuotaDAO.listar().stream()
+                .filter(cuota -> cuota.getCorreoVecino().equalsIgnoreCase(correoVecino))
+                .toList();
+    }
+
+    @Override
+    public Cuota crearCuota(String correoAdmin, CuotaRequestDTO request) {
+        exigirEscrituraTesoreria(correoAdmin);
+
+        if (request.correoVecino() == null || request.correoVecino().isBlank()) {
+            throw new IllegalArgumentException("El correo del vecino es obligatorio");
+        }
+        if (request.periodo() == null || request.periodo().isBlank()) {
+            throw new IllegalArgumentException("El periodo es obligatorio (YYYY-MM)");
+        }
+        if (request.monto() == null || request.monto() <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a cero");
+        }
+
+        Usuario usuario = usuarioService.buscarPorCorreo(request.correoVecino().trim())
+                .orElseThrow(() -> new NoSuchElementException("No existe el vecino"));
+
+        if (!(usuario instanceof Vecino vecino)) {
+            throw new IllegalArgumentException("Solo se pueden asignar cuotas a vecinos");
+        }
+
+        String periodo = request.periodo().trim();
+        boolean duplicada = cuotaDAO.listar().stream()
+                .anyMatch(cuota ->
+                        cuota.getCorreoVecino().equalsIgnoreCase(vecino.getCorreo())
+                                && cuota.getPeriodo().equalsIgnoreCase(periodo));
+
+        if (duplicada) {
+            throw new IllegalArgumentException("Ya existe una cuota para ese vecino en el periodo");
+        }
+
+        Cuota cuota = new Cuota(
+                vecino.getCorreo(),
+                vecino.getNombre(),
+                vecino.getNumeroCasa(),
+                periodo,
+                request.monto(),
+                PENDIENTE
+        );
+
+        return cuotaDAO.guardar(cuota);
+    }
+
+    @Override
+    public Cuota marcarCuotaPagada(String correoAdmin, String cuotaId) {
+        MiembroDirectiva admin = exigirEscrituraTesoreria(correoAdmin);
+
+        Cuota cuota = cuotaDAO.buscarPorId(cuotaId)
+                .orElseThrow(() -> new NoSuchElementException("No existe la cuota"));
+
+        if (PAGADA.equals(cuota.getEstado())) {
+            throw new IllegalArgumentException("La cuota ya esta pagada");
+        }
+
+        String fechaPago = LocalDate.now().toString();
+        cuota.setEstado(PAGADA);
+        cuota.setFechaPago(fechaPago);
+
+        Cuota actualizada = cuotaDAO.actualizar(cuotaId, cuota)
+                .orElseThrow(() -> new NoSuchElementException("No se pudo actualizar la cuota"));
+
+        Movimiento ingreso = new Movimiento(
+                INGRESO,
+                "Cuota " + cuota.getPeriodo() + " - " + cuota.getNombreVecino(),
+                cuota.getMonto(),
+                fechaPago,
+                null,
+                correoAdmin,
+                admin.getNombre()
+        );
+        ingreso.setCuotaId(cuota.getId());
+        movimientoDAO.guardar(ingreso);
+
+        return actualizada;
+    }
+
+    private MiembroDirectiva exigirEscrituraTesoreria(String correoAdmin) {
+        MiembroDirectiva miembro = exigirMiembroDirectiva(correoAdmin);
+        String cargo = miembro.getCargo() == null ? "" : miembro.getCargo().trim().toUpperCase();
+
+        if (!CARGOS_ESCRITURA.contains(cargo)) {
+            throw new SecurityException("Solo Presidente o Tesorero pueden escribir en tesoreria");
+        }
+
+        return miembro;
+    }
+
+    private MiembroDirectiva exigirMiembroDirectiva(String correoAdmin) {
+        Usuario usuario = usuarioService.buscarPorCorreo(correoAdmin)
+                .orElseThrow(() -> new SecurityException("Usuario no autenticado"));
+
+        if (!(usuario instanceof MiembroDirectiva miembro)) {
+            throw new SecurityException("Se requiere un miembro de la directiva");
+        }
+
+        return miembro;
+    }
+}

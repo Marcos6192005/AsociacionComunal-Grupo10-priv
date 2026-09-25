@@ -64,15 +64,15 @@ const data = {
       items: [
         {
           title: "Actas",
-          url: "#",
+          url: "/administracion/secretaria/actas",
         },
         {
           title: "Solicitudes vecinales",
-          url: "#",
+          url: "/administracion/secretaria/solicitudes",
         },
         {
           title: "Comunicados oficiales",
-          url: "#",
+          url: "/administracion/secretaria/comunicados",
         },
       ],
     },
@@ -85,19 +85,15 @@ const data = {
       items: [
         {
           title: "Balance general",
-          url: "#",
+          url: "/administracion/tesoreria/balance",
         },
         {
           title: "Contribuciones mensuales",
-          url: "#",
+          url: "/administracion/tesoreria/contribuciones",
         },
         {
-          title: "Reporte de gastos",
-          url: "#",
-        },
-        {
-          title: "Administrar gastos comunales",
-          url: "#",
+          title: "Gastos y movimientos",
+          url: "/administracion/tesoreria/gastos",
         },
       ],
     },

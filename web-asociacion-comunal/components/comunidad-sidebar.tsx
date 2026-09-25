@@ -57,6 +57,34 @@ const data = {
       ],
     },
     {
+      title: "Secretaría",
+      url: "/comunidad/secretaria/solicitudes",
+      icon: (
+        <HugeiconsIcon icon={FolderIcon} strokeWidth={2} />
+      ),
+      items: [
+        {
+          title: "Mis solicitudes",
+          url: "/comunidad/secretaria/solicitudes",
+        },
+        {
+          title: "Comunicados",
+          url: "/comunidad/secretaria/comunicados",
+        },
+        {
+          title: "Actas publicadas",
+          url: "/comunidad/secretaria/actas",
+        },
+      ],
+    },
+    {
+      title: "Tesorería",
+      url: "/comunidad/tesoreria",
+      icon: (
+        <HugeiconsIcon icon={CheckmarkBadgeIcon} strokeWidth={2} />
+      ),
+    },
+    {
       title: "Comentarios",
       url: "/comunidad/comentarios",
       icon: (

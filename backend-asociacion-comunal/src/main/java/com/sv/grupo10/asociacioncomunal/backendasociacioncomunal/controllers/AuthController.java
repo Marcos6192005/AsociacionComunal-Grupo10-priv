@@ -1,11 +1,11 @@
 package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.controllers;
 
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.AuthRequestDTO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.MiembroDirectiva;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.JwtProvider;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,12 +38,18 @@ public class AuthController {
 
             String token = jwtProvider.generarToken(usuario.getCorreo(), usuario.getRol());
 
+            String cargo = null;
+            if (usuario instanceof MiembroDirectiva miembro) {
+                cargo = miembro.getCargo();
+            }
+
             response.put("mensaje", "Inicio exitoso");
             response.put("token", token);
             response.put("status", "OK");
             response.put("id", usuario.getId());
             response.put("nombre", usuario.getNombre());
             response.put("rol", usuario.getRol());
+            response.put("cargo", cargo);
 
             return ResponseEntity.ok(response);
         }else{

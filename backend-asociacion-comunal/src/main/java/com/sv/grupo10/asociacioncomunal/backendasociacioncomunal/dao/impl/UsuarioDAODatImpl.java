@@ -97,7 +97,13 @@ public class UsuarioDAODatImpl implements UsuarioDAO {
                     "Tesorero"
             );
 
-            // 3. Rol Vecino
+            MiembroDirectiva secretario = new MiembroDirectiva(
+                    "Secretario ADESCO",
+                    "secretario@adesco.com",
+                    "secre123",
+                    "Secretario"
+            );
+
             Vecino vecino = new Vecino(
                     "Vecino 1",
                     "vecino@adesco.com",
@@ -107,8 +113,27 @@ public class UsuarioDAODatImpl implements UsuarioDAO {
 
             guardarUsuario(admin);
             guardarUsuario(tesorero);
+            guardarUsuario(secretario);
             guardarUsuario(vecino);
             System.out.println("Usuario de prueba creado: admin@adesco.com / admin123");
+        } else {
+            asegurarSecretario(usuarios);
+        }
+    }
+
+    private void asegurarSecretario(List<Usuario> usuarios) {
+        boolean existe = usuarios.stream()
+                .anyMatch(usuario -> "secretario@adesco.com".equalsIgnoreCase(usuario.getCorreo()));
+
+        if (!existe) {
+            MiembroDirectiva secretario = new MiembroDirectiva(
+                    "Secretario ADESCO",
+                    "secretario@adesco.com",
+                    "secre123",
+                    "Secretario"
+            );
+            guardarUsuario(secretario);
+            System.out.println("Secretario de prueba creado: secretario@adesco.com / secre123");
         }
     }
 }

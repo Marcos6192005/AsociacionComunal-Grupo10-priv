@@ -46,6 +46,17 @@ export async function loginAction(formData: FormData) {
       maxAge: 60 * 60 * 24,
     })
 
+    if (data.cargo) {
+      cookiesHandler.set({
+        name: "user_cargo",
+        value: data.cargo,
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      })
+    } else {
+      cookiesHandler.delete("user_cargo")
+    }
+
     success = true
     rol = data.rol
   } catch (error) {
@@ -60,10 +71,9 @@ export async function loginAction(formData: FormData) {
 export async function logoutAction() {
   const cookiesHandler = await cookies()
 
-  // Borramos ambas cookies para limpiar la sesión por completo
   cookiesHandler.delete("jwt_token")
   cookiesHandler.delete("user_role")
+  cookiesHandler.delete("user_cargo")
 
-  // Redirigimos al login
   redirect("/login")
 }
