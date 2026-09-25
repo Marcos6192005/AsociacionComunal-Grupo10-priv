@@ -30,6 +30,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Optional<Usuario> buscarPorCorreo(String correo) {
+        return usuarioDAO.buscarPorCorreo(correo);
+    }
+
+    @Override
     public Usuario crearUsuario(Usuario usuario) {
         if (usuarioDAO.buscarPorCorreo(usuario.getCorreo()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un usuario con ese correo");

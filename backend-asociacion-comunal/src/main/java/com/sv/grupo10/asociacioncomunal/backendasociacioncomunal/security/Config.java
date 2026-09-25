@@ -24,6 +24,8 @@ public class Config {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/admin/**", "/api/usuarios/**").hasRole("ADMINISTRACION")
+                        .requestMatchers("/api/comunidad/**").hasRole("VECINO")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtfFilter, UsernamePasswordAuthenticationFilter.class);
