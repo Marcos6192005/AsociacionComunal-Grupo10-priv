@@ -57,6 +57,27 @@ const data = {
       ],
     },
     {
+      title: "Secretaría",
+      url: "/comunidad/secretaria/solicitudes",
+      icon: (
+        <HugeiconsIcon icon={FolderIcon} strokeWidth={2} />
+      ),
+      items: [
+        {
+          title: "Mis solicitudes",
+          url: "/comunidad/secretaria/solicitudes",
+        },
+        {
+          title: "Comunicados",
+          url: "/comunidad/secretaria/comunicados",
+        },
+        {
+          title: "Actas publicadas",
+          url: "/comunidad/secretaria/actas",
+        },
+      ],
+    },
+    {
       title: "Comentarios",
       url: "/comunidad/comentarios",
       icon: (
