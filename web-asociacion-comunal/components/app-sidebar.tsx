@@ -35,15 +35,19 @@ const data = {
       items: [
         {
           title: "Crear proyectos",
-          url: "#",
+          url: "/administracion/proyectos/crear",
         },
         {
           title: "Ver proyectos",
-          url: "#",
+          url: "/administracion/proyectos/ver",
         },
         {
           title: "Editar proyectos",
-          url: "#",
+          url: "/administracion/proyectos/editar",
+        },
+        {
+          title: "Eliminar proyectos",
+          url: "/administracion/proyectos/eliminar",
         },
       ],
     },
