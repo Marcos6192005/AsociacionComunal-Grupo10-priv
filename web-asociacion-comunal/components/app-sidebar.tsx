@@ -85,19 +85,15 @@ const data = {
       items: [
         {
           title: "Balance general",
-          url: "#",
+          url: "/administracion/tesoreria/balance",
         },
         {
           title: "Contribuciones mensuales",
-          url: "#",
+          url: "/administracion/tesoreria/contribuciones",
         },
         {
-          title: "Reporte de gastos",
-          url: "#",
-        },
-        {
-          title: "Administrar gastos comunales",
-          url: "#",
+          title: "Gastos y movimientos",
+          url: "/administracion/tesoreria/gastos",
         },
       ],
     },
