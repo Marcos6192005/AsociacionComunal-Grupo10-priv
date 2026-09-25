@@ -1,7 +1,10 @@
 package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.controllers;
 
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.ComentarioResponseDTO;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.ParticipacionProyectoDTO;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.dtos.ProyectoDTO;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Proyecto;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.ComunidadService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.ProyectoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +24,26 @@ import java.util.List;
 public class AdminProyectoController {
 
     private final ProyectoService proyectoService;
+    private final ComunidadService comunidadService;
 
-    public AdminProyectoController(ProyectoService proyectoService) {
+    public AdminProyectoController(ProyectoService proyectoService, ComunidadService comunidadService) {
         this.proyectoService = proyectoService;
+        this.comunidadService = comunidadService;
     }
 
     @GetMapping("/proyectos")
     public ResponseEntity<List<Proyecto>> listarProyectos() {
         return ResponseEntity.ok(proyectoService.listarProyectos());
+    }
+
+    @GetMapping("/participacion")
+    public ResponseEntity<List<ParticipacionProyectoDTO>> listarParticipacion() {
+        return ResponseEntity.ok(comunidadService.listarParticipacion());
+    }
+
+    @GetMapping("/comentarios")
+    public ResponseEntity<List<ComentarioResponseDTO>> listarComentarios() {
+        return ResponseEntity.ok(comunidadService.listarComentarios());
     }
 
     @GetMapping("/proyectos/{id}")
