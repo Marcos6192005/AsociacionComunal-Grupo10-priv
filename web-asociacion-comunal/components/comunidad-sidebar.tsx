@@ -78,6 +78,13 @@ const data = {
       ],
     },
     {
+      title: "Tesorería",
+      url: "/comunidad/tesoreria",
+      icon: (
+        <HugeiconsIcon icon={CheckmarkBadgeIcon} strokeWidth={2} />
+      ),
+    },
+    {
       title: "Comentarios",
       url: "/comunidad/comentarios",
       icon: (
