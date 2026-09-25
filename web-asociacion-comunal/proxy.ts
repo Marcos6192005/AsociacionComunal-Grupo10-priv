@@ -10,14 +10,14 @@ export default function proxy(request: NextRequest){
 
     const token = request.cookies.get('jwt_token')?.value || ''
     const rol = request.cookies.get('user_role')?.value || ''
-
+    const isAdmin = rol === 'ADMINISTRACION' || rol === 'ROLE_ADMIN'
 
     if (!token && (isAdminRoute || isComunidadRoute)){
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
     if (token && isAuthRoute){
-        if (rol === 'ADMINISTRACION' || rol === 'ROLE_ADMIN'){
+        if (isAdmin){
             return NextResponse.redirect(new URL('/administracion', request.url))
         } else {
             return NextResponse.redirect(new URL('/comunidad', request.url))
@@ -25,8 +25,11 @@ export default function proxy(request: NextRequest){
     }
 
     if (token){
-        if (isAdminRoute && rol !== 'ADMINISTRACION' && rol !== 'ROLE_ADMIN'){
+        if (isAdminRoute && !isAdmin){
             return NextResponse.redirect(new URL('/comunidad', request.url))
+        }
+        if (isComunidadRoute && isAdmin){
+            return NextResponse.redirect(new URL('/administracion', request.url))
         }
     }
 
