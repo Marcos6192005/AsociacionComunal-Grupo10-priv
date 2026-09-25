@@ -1,7 +1,6 @@
 import {
     getUserCargoTesoreria,
     listarMovimientosAction,
-    puedeEscribirTesoreria,
     registrarMovimientoAction,
 } from "@/actions/tesoreria-action"
 import { PageHeader } from "@/components/dashboard/page-header"
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { puedeEscribirTesoreria } from "@/lib/cargo"
 
 export default async function Page() {
     const [result, cargo] = await Promise.all([

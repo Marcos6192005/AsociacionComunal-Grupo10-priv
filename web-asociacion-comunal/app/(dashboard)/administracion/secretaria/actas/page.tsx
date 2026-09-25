@@ -2,7 +2,6 @@ import {
     crearActaAction,
     getUserCargo,
     listarActasAdminAction,
-    puedeEscribirSecretaria,
     publicarActaAction,
 } from "@/actions/secretaria-action"
 import { PageHeader } from "@/components/dashboard/page-header"
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { puedeEscribirSecretaria } from "@/lib/cargo"
 
 export default async function Page() {
     const [result, cargo] = await Promise.all([listarActasAdminAction(), getUserCargo()])

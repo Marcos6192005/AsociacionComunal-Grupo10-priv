@@ -46,11 +46,6 @@ export async function getUserCargoTesoreria(): Promise<string> {
   return cookiesHandler.get("user_cargo")?.value || ""
 }
 
-export function puedeEscribirTesoreria(cargo: string): boolean {
-  const normalizado = cargo.trim().toUpperCase()
-  return normalizado === "PRESIDENTE" || normalizado === "TESORERO"
-}
-
 function authHeaders(token: string) {
   return {
     Authorization: `Bearer ${token}`,

@@ -53,11 +53,6 @@ export async function getUserCargo(): Promise<string> {
   return cookiesHandler.get("user_cargo")?.value || ""
 }
 
-export function puedeEscribirSecretaria(cargo: string): boolean {
-  const normalizado = cargo.trim().toUpperCase()
-  return normalizado === "PRESIDENTE" || normalizado === "SECRETARIO"
-}
-
 function authHeaders(token: string) {
   return {
     Authorization: `Bearer ${token}`,
