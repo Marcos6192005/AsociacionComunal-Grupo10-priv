@@ -48,6 +48,7 @@ public class AuthController {
             response.put("status", "OK");
             response.put("id", usuario.getId());
             response.put("nombre", usuario.getNombre());
+            response.put("correo", usuario.getCorreo());
             response.put("rol", usuario.getRol());
             response.put("cargo", cargo);
 
