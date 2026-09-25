@@ -1,5 +1,6 @@
 "use client"
 
+import { logoutAction } from "@/actions/auth-action"
 import {
   Avatar,
   AvatarFallback,
@@ -95,7 +96,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => logoutAction()}>
               <HugeiconsIcon icon={LogoutIcon} strokeWidth={2} />
               Log out
             </DropdownMenuItem>

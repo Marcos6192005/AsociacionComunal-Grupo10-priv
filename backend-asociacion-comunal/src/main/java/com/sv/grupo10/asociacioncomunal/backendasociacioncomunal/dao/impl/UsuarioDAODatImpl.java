@@ -34,6 +34,48 @@ public class UsuarioDAODatImpl implements UsuarioDAO {
                 .findFirst();
     }
 
+    @Override
+    public List<Usuario> listarUsuarios() {
+        return ArchivoDatUtil.leerDatos(USUARIOS);
+    }
+
+    @Override
+    public Optional<Usuario> buscarPorId(String id) {
+        List<Usuario> usuarios = ArchivoDatUtil.leerDatos(USUARIOS);
+
+        return usuarios.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst();
+    }
+
+    @Override
+    public boolean actualizarUsuario(Usuario usuario) {
+        List<Usuario> usuarios = ArchivoDatUtil.leerDatos(USUARIOS);
+
+        for (int i = 0; i < usuarios.size(); i++) {
+            if (usuarios.get(i).getId().equals(usuario.getId())) {
+                usuarios.set(i, usuario);
+                ArchivoDatUtil.guardarDatos(USUARIOS, usuarios);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean eliminarUsuario(String id) {
+        List<Usuario> usuarios = ArchivoDatUtil.leerDatos(USUARIOS);
+
+        boolean eliminado = usuarios.removeIf(u -> u.getId().equals(id));
+
+        if (eliminado) {
+            ArchivoDatUtil.guardarDatos(USUARIOS, usuarios);
+        }
+
+        return eliminado;
+    }
+
     @PostConstruct
     public void poblarDatosIniciales() {
         List<Usuario> usuarios = ArchivoDatUtil.leerDatos(USUARIOS);

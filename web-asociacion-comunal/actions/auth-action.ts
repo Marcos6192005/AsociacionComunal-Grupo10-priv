@@ -4,54 +4,63 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 export async function loginAction(formData: FormData) {
-    const correo = formData.get("email")
-    const password = formData.get("password")
+  const correo = formData.get("email")
+  const password = formData.get("password")
 
-    if (!correo || !password){
-        return { error: "Asegurate de completar todos los campos"}
+  if (!correo || !password) {
+    return { error: "Asegurate de completar todos los campos" }
+  }
+
+  let success = false
+
+  try {
+    const response = await fetch("http://localhost:8081/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, password }),
+      cache: "no-store",
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      return { error: data.mensaje || "Credenciales Incorrectas" }
     }
 
-    let success = false
+    const cookiesHandler = await cookies()
+    cookiesHandler.set({
+      name: "jwt_token",
+      value: data.token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "development",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    })
 
-    try {
-        const response = await fetch("http://localhost:8081/api/auth/login", {
-            method: "POST",
-            headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({correo, password}),
-            cache: "no-store"
-        })
+    cookiesHandler.set({
+      name: "user_role",
+      value: data.rol,
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    })
 
-        const data = await response.json()
+    success = true
+  } catch (error) {
+    return { error: "Error de conexion con el servidor." }
+  }
 
-        if(!response.ok){
-            return { error: data.mensaje || "Credenciales Incorrectas"}
-        }
+  if (success) {
+    redirect("/administracion")
+  }
+}
+export async function logoutAction() {
+  const cookiesHandler = await cookies()
 
-        const cookiesHandler = await cookies()
-        cookiesHandler.set({
-            name: "jwt_token",
-            value: data.token,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "development",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24
-        })
+  // Borramos ambas cookies para limpiar la sesión por completo
+  cookiesHandler.delete("jwt_token")
+  cookiesHandler.delete("user_role")
 
-        cookiesHandler.set({
-            name: "user_role",
-            value: data.rol,
-            path: "/",
-            maxAge: 60 * 60 * 24
-        })
-
-        success = true
-
-    } catch(error) {
-        return { error: "Error de conexion con el servidor."}
-    }
-
-    if (success){
-        redirect("/administracion")
-    }
+  // Redirigimos al login
+  redirect("/login")
 }
