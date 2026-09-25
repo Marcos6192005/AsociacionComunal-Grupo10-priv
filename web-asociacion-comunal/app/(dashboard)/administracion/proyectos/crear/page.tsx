@@ -1,4 +1,5 @@
 import { crearProyectoAction } from "@/actions/proyectos-action"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
@@ -6,11 +7,13 @@ import { Input } from "@/components/ui/input"
 
 export default function Page() {
     return (
-        <div className="w-full max-w-4xl">
-            <h1>Crear proyectos</h1>
-            <p className="pt-2">Registra un nuevo proyecto de la asociación.</p>
+        <div>
+            <PageHeader
+                title="Crear proyectos"
+                description="Registra un nuevo proyecto de la asociación."
+            />
 
-            <Card className="mt-4">
+            <Card>
                 <CardHeader>
                     <CardTitle>Nuevo proyecto</CardTitle>
                 </CardHeader>

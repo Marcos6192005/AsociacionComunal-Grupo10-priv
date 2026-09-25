@@ -2,6 +2,8 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbLink } from "@/components/ui/breadcrumb"
 import { ComunidadSidebar } from "@/components/comunidad-sidebar"
+import { DashboardCanvas } from "@/components/dashboard/dashboard-canvas"
+import { ComunidadRail } from "@/components/dashboard/comunidad-rail"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
@@ -9,7 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <ComunidadSidebar />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2">
-                    <div className="flex items-center gap-2 px-4">
+                    <div className="flex items-center gap-2 px-4 lg:px-6">
                         <SidebarTrigger className="-ml-1" />
                         <Separator
                             orientation="vertical"
@@ -30,9 +32,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         </Breadcrumb>
                     </div>
                 </header>
-                <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                <DashboardCanvas aside={<ComunidadRail />}>
                     {children}
-                </main>
+                </DashboardCanvas>
             </SidebarInset>
         </SidebarProvider>
     )

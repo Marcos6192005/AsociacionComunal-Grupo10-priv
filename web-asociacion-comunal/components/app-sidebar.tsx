@@ -49,6 +49,10 @@ const data = {
           title: "Eliminar proyectos",
           url: "/administracion/proyectos/eliminar",
         },
+        {
+          title: "Participación y votos",
+          url: "/administracion/proyectos/participacion",
+        },
       ],
     },
     {
@@ -129,7 +133,7 @@ const data = {
     },
     {
       title: "Comentarios y sugerencias",
-      url: "#",
+      url: "/administracion/comentarios",
       icon: (
         <HugeiconsIcon icon={SentIcon} strokeWidth={2} />
       ),
@@ -178,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} label="Administración" />
         <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>

@@ -7,6 +7,7 @@ import {
   Usuario,
 } from "@/actions/usuario-action"
 import { CrearUsuarioForm } from "@/components/Usuarios/crear-usuario-form"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -14,7 +15,6 @@ export default function Page() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [usuarioAEditar, setUsuarioAEditar] = useState<Usuario | null>(null)
 
-  // Función limpia para refrescar la lista de usuarios
   const refrescarUsuarios = () => {
     listarUsuariosAction()
       .then((lista) => {
@@ -25,7 +25,6 @@ export default function Page() {
       })
   }
 
-  // Carga inicial al abrir la página
   useEffect(() => {
     listarUsuariosAction()
       .then((lista) => {
@@ -36,7 +35,6 @@ export default function Page() {
       })
   }, [])
 
-  // Función para manejar la eliminación de un usuario
   const handleEliminar = async (id: string) => {
     const formData = new FormData()
     formData.append("id", id)
@@ -53,16 +51,18 @@ export default function Page() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-        {/* TABLA DE USUARIOS */}
-        <Card className="flex-1">
-          <CardHeader>
-            <CardTitle>Listado de Usuarios Comunales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-sm">
+    <div className="grid gap-2">
+      <PageHeader
+        title="Usuarios"
+        description="Listado de vecinos y directiva. El alta y la edición quedan debajo de la tabla."
+      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de usuarios comunales</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="p-3 font-medium">Nombre</th>
@@ -131,20 +131,15 @@ export default function Page() {
                   )}
                 </tbody>
               </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* FORMULARIO LATERAL (CREAR / EDITAR) */}
-        <div className="w-full shrink-0 md:w-80">
-          <CrearUsuarioForm
-            key={usuarioAEditar?.id ?? "nuevo"}
-            usuarioAEditar={usuarioAEditar}
-            onCancelEdit={() => setUsuarioAEditar(null)}
-            onSuccess={refrescarUsuarios}
-          />
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
+      <CrearUsuarioForm
+        key={usuarioAEditar?.id ?? "nuevo"}
+        usuarioAEditar={usuarioAEditar}
+        onCancelEdit={() => setUsuarioAEditar(null)}
+        onSuccess={refrescarUsuarios}
+      />
     </div>
   )
 }
