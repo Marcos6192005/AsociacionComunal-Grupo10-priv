@@ -1,4 +1,5 @@
 import { eliminarProyectoAction, getProyectosAction } from "@/actions/proyectos-action"
+import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -7,20 +8,22 @@ export default async function Page() {
     const proyectos = result.data ?? []
 
     return (
-        <div className="w-full max-w-4xl">
-            <h1>Eliminar proyectos</h1>
-            <p className="pt-2">Elimina un proyecto existente. Esta acción no se puede deshacer.</p>
+        <div>
+            <PageHeader
+                title="Eliminar proyectos"
+                description="Elimina un proyecto existente. Esta acción no se puede deshacer."
+            />
 
             {result.error && (
                 <p className="pt-2 text-sm text-red-500">{result.error}</p>
             )}
 
             {proyectos.length === 0 ? (
-                <p className="pt-4 text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                     Aún no hay proyectos para eliminar.
                 </p>
             ) : (
-                <div className="grid gap-4 pt-4">
+                <div className="grid gap-4">
                     {proyectos.map((proyecto) => (
                         <Card key={proyecto.id}>
                             <CardHeader>
