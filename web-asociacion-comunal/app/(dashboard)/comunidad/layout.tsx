@@ -4,11 +4,14 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbS
 import { ComunidadSidebar } from "@/components/comunidad-sidebar"
 import { DashboardCanvas } from "@/components/dashboard/dashboard-canvas"
 import { ComunidadRail } from "@/components/dashboard/comunidad-rail"
+import { getSessionUser } from "@/actions/auth-action"
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+    const user = await getSessionUser()
+
     return (
         <SidebarProvider>
-            <ComunidadSidebar />
+            <ComunidadSidebar user={user} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2">
                     <div className="flex items-center gap-2 px-4 lg:px-6">

@@ -12,6 +12,7 @@ import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Vecino;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.TesoreriaService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.Roles;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,7 +28,10 @@ public class TesoreriaServiceImpl implements TesoreriaService {
     private static final String PENDIENTE = "PENDIENTE";
     private static final String PAGADA = "PAGADA";
 
-    private static final Set<String> CARGOS_ESCRITURA = Set.of("PRESIDENTE", "TESORERO");
+    private static final Set<String> CARGOS_ESCRITURA = Set.of(
+            Roles.PRESIDENTE,
+            Roles.TESORERO
+    );
     private static final Set<String> TIPOS_MOVIMIENTO = Set.of(INGRESO, EGRESO);
 
     private final MovimientoDAO movimientoDAO;
@@ -198,7 +202,7 @@ public class TesoreriaServiceImpl implements TesoreriaService {
 
     private MiembroDirectiva exigirEscrituraTesoreria(String correoAdmin) {
         MiembroDirectiva miembro = exigirMiembroDirectiva(correoAdmin);
-        String cargo = miembro.getCargo() == null ? "" : miembro.getCargo().trim().toUpperCase();
+        String cargo = Roles.normalizar(miembro.getCargo());
 
         if (!CARGOS_ESCRITURA.contains(cargo)) {
             throw new SecurityException("Solo Presidente o Tesorero pueden escribir en tesoreria");

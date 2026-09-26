@@ -16,6 +16,7 @@ import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.SecretariaService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.Roles;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,7 +41,10 @@ public class SecretariaServiceImpl implements SecretariaService {
             ESTADO_RECHAZADA
     );
 
-    private static final Set<String> CARGOS_ESCRITURA = Set.of("PRESIDENTE", "SECRETARIO");
+    private static final Set<String> CARGOS_ESCRITURA = Set.of(
+            Roles.PRESIDENTE,
+            Roles.SECRETARIO
+    );
 
     private final SolicitudDAO solicitudDAO;
     private final ActaDAO actaDAO;
@@ -227,7 +231,7 @@ public class SecretariaServiceImpl implements SecretariaService {
 
     private MiembroDirectiva exigirEscrituraSecretaria(String correoAdmin) {
         MiembroDirectiva miembro = exigirMiembroDirectiva(correoAdmin);
-        String cargo = miembro.getCargo() == null ? "" : miembro.getCargo().trim().toUpperCase();
+        String cargo = Roles.normalizar(miembro.getCargo());
 
         if (!CARGOS_ESCRITURA.contains(cargo)) {
             throw new SecurityException("Solo Presidente o Secretario pueden escribir en secretaria");

@@ -25,11 +25,6 @@ import {
 } from "@hugeicons/core-free-icons"
 
 const data = {
-  user: {
-    name: "Vecino",
-    email: "vecino@asociacion.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Overview",
@@ -117,7 +112,16 @@ const data = {
   ],
 }
 
-export function ComunidadSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function ComunidadSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  user: {
+    name: string
+    email: string
+    avatar: string
+  }
+}) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -140,7 +144,7 @@ export function ComunidadSidebar({ ...props }: React.ComponentProps<typeof Sideb
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

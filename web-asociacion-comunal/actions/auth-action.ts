@@ -2,6 +2,22 @@
 
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { esRolDirectiva } from "@/lib/roles"
+
+export type SessionUser = {
+  name: string
+  email: string
+  avatar: string
+}
+
+export async function getSessionUser(): Promise<SessionUser> {
+  const cookiesHandler = await cookies()
+  return {
+    name: cookiesHandler.get("user_nombre")?.value || "Usuario",
+    email: cookiesHandler.get("user_correo")?.value || "",
+    avatar: "",
+  }
+}
 
 export async function loginAction(formData: FormData) {
   const correo = formData.get("email")
@@ -46,6 +62,20 @@ export async function loginAction(formData: FormData) {
       maxAge: 60 * 60 * 24,
     })
 
+    cookiesHandler.set({
+      name: "user_nombre",
+      value: data.nombre || "",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    })
+
+    cookiesHandler.set({
+      name: "user_correo",
+      value: data.correo || String(correo),
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    })
+
     if (data.cargo) {
       cookiesHandler.set({
         name: "user_cargo",
@@ -64,16 +94,18 @@ export async function loginAction(formData: FormData) {
   }
 
   if (success) {
-    const isAdmin = rol === "ADMINISTRACION" || rol === "ROLE_ADMIN"
-    redirect(isAdmin ? "/administracion" : "/comunidad")
+    redirect(esRolDirectiva(rol) ? "/administracion" : "/comunidad")
   }
 }
+
 export async function logoutAction() {
   const cookiesHandler = await cookies()
 
   cookiesHandler.delete("jwt_token")
   cookiesHandler.delete("user_role")
   cookiesHandler.delete("user_cargo")
+  cookiesHandler.delete("user_nombre")
+  cookiesHandler.delete("user_correo")
 
   redirect("/login")
 }

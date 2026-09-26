@@ -25,7 +25,7 @@ export function CrearUsuarioForm({
   const [error, setError] = useState<string | null>(null)
   const [exito, setExito] = useState(false)
   const [tipo, setTipo] = useState(
-    usuarioAEditar?.rol === "ADMINISTRACION" ? "DIRECTIVA" : "VECINO"
+    usuarioAEditar && usuarioAEditar.rol !== "VECINO" ? "DIRECTIVA" : "VECINO"
   )
 
   // Estados locales para los valores de los inputs, inicializados desde
@@ -143,13 +143,20 @@ export function CrearUsuarioForm({
               </Field>
             ) : (
               <Field>
-                <FieldLabel htmlFor="cargo">Cargo</FieldLabel>
-                <Input
+                <FieldLabel htmlFor="cargo">Cargo / Rol</FieldLabel>
+                <select
                   id="cargo"
                   name="cargo"
                   value={cargo}
                   onChange={(e) => setCargo(e.target.value)}
-                />
+                  required
+                  className="h-8 w-full rounded-2xl border border-border bg-background px-3 text-sm"
+                >
+                  <option value="">Selecciona un cargo</option>
+                  <option value="Presidente">Presidente</option>
+                  <option value="Secretario">Secretario</option>
+                  <option value="Tesorero">Tesorero</option>
+                </select>
               </Field>
             )}
 

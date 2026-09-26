@@ -24,8 +24,13 @@ public class Config {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/admin/**", "/api/usuarios/**").hasRole("ADMINISTRACION")
-                        .requestMatchers("/api/comunidad/**").hasRole("VECINO")
+                        .requestMatchers("/api/admin/**", "/api/usuarios/**").hasAnyRole(
+                                Roles.ADMINISTRACION,
+                                Roles.PRESIDENTE,
+                                Roles.SECRETARIO,
+                                Roles.TESORERO
+                        )
+                        .requestMatchers("/api/comunidad/**").hasRole(Roles.VECINO)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtfFilter, UsernamePasswordAuthenticationFilter.class);

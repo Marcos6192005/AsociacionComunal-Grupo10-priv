@@ -4,16 +4,19 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage, BreadcrumbS
 import { AppSidebar } from "@/components/app-sidebar"
 import { DashboardCanvas } from "@/components/dashboard/dashboard-canvas"
 import { AdminRail } from "@/components/dashboard/admin-rail"
+import { getSessionUser } from "@/actions/auth-action"
 
 export const metadata = {
     title: "Administración",
     description: "Administración de la asociación",
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+    const user = await getSessionUser()
+
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar user={user} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2">
                     <div className="flex items-center gap-2 px-4 lg:px-6">
