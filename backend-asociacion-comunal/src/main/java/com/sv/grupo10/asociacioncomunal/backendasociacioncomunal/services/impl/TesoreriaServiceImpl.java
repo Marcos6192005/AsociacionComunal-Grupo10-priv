@@ -10,6 +10,9 @@ import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Movimiento;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Vecino;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailCuotaPendiente;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailPagoRegistrado;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.NotificacionCorreo;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.TesoreriaService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.Roles;
@@ -37,15 +40,18 @@ public class TesoreriaServiceImpl implements TesoreriaService {
     private final MovimientoDAO movimientoDAO;
     private final CuotaDAO cuotaDAO;
     private final UsuarioService usuarioService;
+    private final NotificacionCorreo notificacionCorreo;
 
     public TesoreriaServiceImpl(
             MovimientoDAO movimientoDAO,
             CuotaDAO cuotaDAO,
-            UsuarioService usuarioService
+            UsuarioService usuarioService,
+            NotificacionCorreo notificacionCorreo
     ) {
         this.movimientoDAO = movimientoDAO;
         this.cuotaDAO = cuotaDAO;
         this.usuarioService = usuarioService;
+        this.notificacionCorreo = notificacionCorreo;
     }
 
     @Override
@@ -164,7 +170,14 @@ public class TesoreriaServiceImpl implements TesoreriaService {
                 PENDIENTE
         );
 
-        return cuotaDAO.guardar(cuota);
+        Cuota guardada = cuotaDAO.guardar(cuota);
+        notificacionCorreo.avisar(new EmailCuotaPendiente(
+                guardada.getCorreoVecino(),
+                guardada.getPeriodo(),
+                guardada.getMonto(),
+                guardada.getNombreVecino()
+        ));
+        return guardada;
     }
 
     @Override
@@ -196,6 +209,13 @@ public class TesoreriaServiceImpl implements TesoreriaService {
         );
         ingreso.setCuotaId(cuota.getId());
         movimientoDAO.guardar(ingreso);
+
+        notificacionCorreo.avisar(new EmailPagoRegistrado(
+                actualizada.getCorreoVecino(),
+                actualizada.getPeriodo(),
+                actualizada.getMonto(),
+                actualizada.getFechaPago()
+        ));
 
         return actualizada;
     }

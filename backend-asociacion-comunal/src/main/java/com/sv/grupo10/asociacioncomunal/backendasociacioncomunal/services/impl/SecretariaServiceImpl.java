@@ -14,6 +14,12 @@ import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.MiembroDirectiva;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Solicitud;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Vecino;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailComunicado;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailSolicitudRecibida;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailSolicitudRespondida;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.PlantillaEmail;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.NotificacionCorreo;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.SecretariaService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.security.Roles;
@@ -21,7 +27,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -46,21 +54,29 @@ public class SecretariaServiceImpl implements SecretariaService {
             Roles.SECRETARIO
     );
 
+    private static final Set<String> ESTADOS_CON_CORREO = Set.of(
+            ESTADO_RESUELTA,
+            ESTADO_RECHAZADA
+    );
+
     private final SolicitudDAO solicitudDAO;
     private final ActaDAO actaDAO;
     private final ComunicadoDAO comunicadoDAO;
     private final UsuarioService usuarioService;
+    private final NotificacionCorreo notificacionCorreo;
 
     public SecretariaServiceImpl(
             SolicitudDAO solicitudDAO,
             ActaDAO actaDAO,
             ComunicadoDAO comunicadoDAO,
-            UsuarioService usuarioService
+            UsuarioService usuarioService,
+            NotificacionCorreo notificacionCorreo
     ) {
         this.solicitudDAO = solicitudDAO;
         this.actaDAO = actaDAO;
         this.comunicadoDAO = comunicadoDAO;
         this.usuarioService = usuarioService;
+        this.notificacionCorreo = notificacionCorreo;
     }
 
     @Override
@@ -97,7 +113,9 @@ public class SecretariaServiceImpl implements SecretariaService {
                 LocalDate.now().toString()
         );
 
-        return solicitudDAO.guardar(solicitud);
+        Solicitud guardada = solicitudDAO.guardar(solicitud);
+        avisarSolicitudRecibida(guardada);
+        return guardada;
     }
 
     @Override
@@ -124,8 +142,19 @@ public class SecretariaServiceImpl implements SecretariaService {
             existente.setProyectoId(request.proyectoId().trim());
         }
 
-        return solicitudDAO.actualizar(solicitudId, existente)
+        Solicitud actualizada = solicitudDAO.actualizar(solicitudId, existente)
                 .orElseThrow(() -> new NoSuchElementException("No se pudo actualizar la solicitud"));
+
+        if (ESTADOS_CON_CORREO.contains(actualizada.getEstado())) {
+            notificacionCorreo.avisar(new EmailSolicitudRespondida(
+                    actualizada.getCorreoAutor(),
+                    actualizada.getTitulo(),
+                    actualizada.getEstado(),
+                    actualizada.getRespuesta()
+            ));
+        }
+
+        return actualizada;
     }
 
     @Override
@@ -208,7 +237,9 @@ public class SecretariaServiceImpl implements SecretariaService {
                 admin.getNombre()
         );
 
-        return comunicadoDAO.guardar(comunicado);
+        Comunicado guardado = comunicadoDAO.guardar(comunicado);
+        avisarComunicado(guardado);
+        return guardado;
     }
 
     private List<AcuerdoActa> mapearAcuerdos(List<AcuerdoActaDTO> acuerdos) {
@@ -227,6 +258,60 @@ public class SecretariaServiceImpl implements SecretariaService {
             resultado.add(new AcuerdoActa(acuerdo.texto().trim(), proyectoId));
         }
         return resultado;
+    }
+
+    private void avisarSolicitudRecibida(Solicitud solicitud) {
+        List<PlantillaEmail> avisos = new ArrayList<>();
+        Set<String> vistos = new HashSet<>();
+
+        for (Usuario usuario : usuarioService.listarUsuarios()) {
+            if (!(usuario instanceof MiembroDirectiva miembro)) {
+                continue;
+            }
+            if (!CARGOS_ESCRITURA.contains(Roles.normalizar(miembro.getCargo()))) {
+                continue;
+            }
+            String correo = correoUtil(miembro.getCorreo(), vistos);
+            if (correo == null) {
+                continue;
+            }
+            avisos.add(new EmailSolicitudRecibida(
+                    correo,
+                    solicitud.getTitulo(),
+                    solicitud.getNombreAutor()
+            ));
+        }
+
+        notificacionCorreo.avisarVarios(avisos);
+    }
+
+    private void avisarComunicado(Comunicado comunicado) {
+        List<PlantillaEmail> avisos = new ArrayList<>();
+        Set<String> vistos = new HashSet<>();
+
+        for (Usuario usuario : usuarioService.listarUsuarios()) {
+            if (!(usuario instanceof Vecino)) {
+                continue;
+            }
+            String correo = correoUtil(usuario.getCorreo(), vistos);
+            if (correo == null) {
+                continue;
+            }
+            avisos.add(new EmailComunicado(correo, comunicado.getTitulo(), comunicado.getContenido()));
+        }
+
+        notificacionCorreo.avisarVarios(avisos);
+    }
+
+    private static String correoUtil(String correo, Set<String> vistos) {
+        if (correo == null || correo.isBlank()) {
+            return null;
+        }
+        String limpio = correo.trim();
+        if (!vistos.add(limpio.toLowerCase(Locale.ROOT))) {
+            return null;
+        }
+        return limpio;
     }
 
     private MiembroDirectiva exigirEscrituraSecretaria(String correoAdmin) {

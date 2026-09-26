@@ -2,6 +2,8 @@ package com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.impl;
 
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.dao.interfaces.UsuarioDAO;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.entities.Usuario;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.models.plantillas.EmailBienvenida;
+import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.NotificacionCorreo;
 import com.sv.grupo10.asociacioncomunal.backendasociacioncomunal.services.UsuarioService;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +15,11 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioDAO usuarioDAO;
+    private final NotificacionCorreo notificacionCorreo;
 
-    public UsuarioServiceImpl(UsuarioDAO usuarioDAO) {
+    public UsuarioServiceImpl(UsuarioDAO usuarioDAO, NotificacionCorreo notificacionCorreo) {
         this.usuarioDAO = usuarioDAO;
+        this.notificacionCorreo = notificacionCorreo;
     }
 
     @Override
@@ -41,6 +45,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         usuarioDAO.guardarUsuario(usuario);
+        notificacionCorreo.avisar(new EmailBienvenida(usuario.getCorreo(), usuario.getNombre()));
         return usuario;
     }
 
